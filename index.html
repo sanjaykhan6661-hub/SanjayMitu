@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#00a884">
+<meta name="mobile-web-app-capable" content="yes">
+<title>SanjayMitu</title>
+<link rel="manifest" href="manifest.json">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0b141a;--s:#111b21;--s2:#1f2c33;--s3:#2a3942;--gr:#00a884;--tx:#e9edef;--mu:#8696a0;--br:#222d34;--re:#ea4335;--am:#f7a800;--bl:#53bdeb;--pk:#ec4899}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--tx);font-family:'Hind Siliguri',sans-serif;display:flex;flex-direction:column;height:100vh}
+.top{background:var(--s);padding:11px 14px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;height:52px}
+.ttl{font-size:18px;font-weight:700;color:var(--gr)}
+.badge{background:var(--s2);border:1px solid var(--br);border-radius:18px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--gr);letter-spacing:1px;cursor:pointer}
+.tabnav{background:var(--s);border-bottom:1px solid var(--br);display:flex;flex-shrink:0;height:52px}
+.tn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;position:relative}
+.tn.on{border-bottom-color:var(--gr)}
+.tn-ico{font-size:20px}
+.tn-lbl{font-size:9px;font-weight:700;color:var(--mu);font-family:'Hind Siliguri',sans-serif}
+.tn.on .tn-lbl{color:var(--gr)}
+.nbdg{position:absolute;top:4px;right:12px;background:var(--re);color:#fff;border-radius:9px;font-size:9px;font-weight:700;padding:1px 4px;display:none}
+.nbdg.on{display:block}
+.main{flex:1;overflow:hidden;position:relative;min-height:0}
+.tab{display:none;flex-direction:column;position:absolute;inset:0;overflow:hidden}
+.tab.on{display:flex}
+.stbar{padding:7px 12px;font-size:12px;text-align:center;display:none;flex-shrink:0;line-height:1.5}
+.stbar.on{display:block}
+.stbar.i{background:rgba(247,168,0,.12);color:var(--am)}
+.stbar.k{background:rgba(0,168,132,.12);color:var(--gr)}
+.stbar.e{background:rgba(234,67,53,.12);color:var(--re)}
+.cbox{background:var(--s2);margin:10px;border-radius:12px;padding:12px;border:1px solid var(--br);flex-shrink:0}
+.clbl{font-size:10px;color:var(--mu);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px}
+.crow{display:flex;gap:8px;align-items:center}
+.cinp{flex:1;background:var(--bg);border:1.5px solid var(--br);border-radius:8px;color:var(--tx);font-family:'Hind Siliguri',sans-serif;font-size:17px;font-weight:700;padding:9px 12px;outline:none;text-align:center;letter-spacing:2px;text-transform:uppercase}
+.cinp::placeholder{font-size:12px;letter-spacing:0;font-weight:400;color:var(--mu)}
+.cinp:focus{border-color:var(--gr)}
+.cbtn{width:42px;height:42px;border-radius:50%;border:none;background:var(--gr);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.banner{background:rgba(0,168,132,.1);border:1px solid rgba(0,168,132,.25);border-radius:10px;margin:10px;padding:10px 12px;display:none;align-items:center;gap:10px;flex-shrink:0}
+.banner.on{display:flex}
+.bav{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--pk),#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.binfo{flex:1}
+.bnm{font-size:14px;font-weight:700}
+.bst{font-size:11px;color:var(--gr)}
+.bacts{display:flex;gap:6px}
+.bact{width:34px;height:34px;border-radius:50%;border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.bact.a{background:rgba(83,189,235,.15);color:var(--bl)}
+.bact.v{background:rgba(247,168,0,.15);color:var(--am)}
+.msgs{flex:1;overflow-y:auto;padding:8px 10px;display:flex;flex-direction:column;gap:5px}
+.mw{display:flex;flex-direction:column;position:relative}
+.mw.me{align-items:flex-end}
+.mw.them{align-items:flex-start}
+.mb{max-width:82%;padding:7px 11px;border-radius:10px;font-size:15px;line-height:1.5;word-break:break-word}
+.mw.me .mb{background:#005c4b;border-bottom-right-radius:2px}
+.mw.them .mb{background:var(--s);border-bottom-left-radius:2px}
+.mt{font-size:10px;color:var(--mu);margin-top:1px;padding:0 3px}
+.sysmsg{text-align:center;font-size:11px;color:var(--mu);padding:4px 12px;background:rgba(255,255,255,.04);border-radius:16px;align-self:center;margin:4px 0}
+.upl{font-size:12px;color:var(--am);text-align:center;padding:6px;align-self:center;background:rgba(247,168,0,.08);border-radius:8px;width:90%}
+.del-popup{position:absolute;background:var(--s3);border-radius:10px;padding:6px 0;box-shadow:0 4px 16px rgba(0,0,0,.5);z-index:50;display:none;min-width:130px}
+.del-popup.on{display:block}
+.mw.me .del-popup{right:0;top:-40px}
+.mw.them .del-popup{left:0;top:-40px}
+.del-opt{padding:9px 16px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;color:var(--re)}
+.del-opt:active{background:rgba(255,255,255,.05)}
+
+/* Progress bar */
+.prog-wrap{width:100%;height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:6px;overflow:hidden}
+.prog-bar{height:100%;background:var(--gr);border-radius:2px;transition:width .3s;width:0%}
+
+.cbar{background:var(--s);padding:6px 8px;border-top:1px solid var(--br);display:flex;align-items:center;gap:7px;flex-shrink:0}
+.iico{width:36px;height:36px;border-radius:50%;border:none;background:var(--s2);color:var(--mu);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.iico:active{background:var(--s3);color:var(--gr)}
+.minp{flex:1;background:var(--s2);border:none;border-radius:20px;color:var(--tx);font-family:'Hind Siliguri',sans-serif;font-size:15px;padding:9px 14px;outline:none;resize:none;max-height:88px;line-height:1.4}
+.minp::placeholder{color:var(--mu)}
+.sbtn{width:38px;height:38px;border-radius:50%;background:var(--gr);border:none;color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* CALLS */
+.cbody{flex:1;overflow-y:auto;padding:10px}
+.ccrd{background:var(--s);border-radius:14px;border:1px solid var(--br);padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;cursor:pointer}
+.ccrd:active{background:var(--s2)}
+.cico{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.cico.v{background:rgba(247,168,0,.15)}
+.cico.a{background:rgba(83,189,235,.15)}
+.ctxt{flex:1}
+.ctitle{font-size:16px;font-weight:700}
+.cdesc{font-size:12px;color:var(--mu);margin-top:2px}
+.carr{font-size:20px;color:var(--mu)}
+.hhdr{font-size:10px;color:var(--mu);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin:12px 0 8px}
+.hitem{background:var(--s);border-radius:10px;border:1px solid var(--br);padding:10px 12px;margin-bottom:7px;display:flex;align-items:center;gap:10px}
+.hav{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--pk),#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.hinfo{flex:1}
+.hnm{font-size:13px;font-weight:600}
+.htm{font-size:11px;color:var(--mu)}
+.hredo{font-size:18px;cursor:pointer}
+
+/* MEDIA */
+.ibody{flex:1;overflow-y:auto;padding:10px}
+.uzone{background:var(--s);border:2px dashed var(--br);border-radius:14px;padding:24px 16px;text-align:center;cursor:pointer;margin-bottom:12px}
+.uzone:active{background:var(--s2);border-color:var(--gr)}
+.uico{font-size:40px;margin-bottom:8px}
+.utitle{font-size:15px;font-weight:700;margin-bottom:3px}
+.udesc{font-size:12px;color:var(--mu)}
+.igrid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.ithumb{width:100%;aspect-ratio:1;object-fit:cover;border-radius:5px;cursor:pointer;background:var(--s2)}
+.etxt{text-align:center;padding:20px;color:var(--mu);font-size:13px}
+
+.fbody{flex:1;overflow-y:auto;padding:10px}
+.fupz{background:var(--s);border:2px dashed var(--br);border-radius:14px;padding:22px 16px;text-align:center;cursor:pointer;margin-bottom:12px}
+.fupz:active{background:var(--s2);border-color:var(--gr)}
+.flist{display:flex;flex-direction:column;gap:7px}
+.fitem{background:var(--s);border:1px solid var(--br);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.fitem:active{background:var(--s2)}
+.fico2{font-size:26px;flex-shrink:0}
+.finf{flex:1;min-width:0}
+.fnm{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fmt2{font-size:11px;color:var(--mu)}
+.fdl{font-size:18px;color:var(--gr);flex-shrink:0}
+
+/* INCOMING */
+.incov{position:fixed;inset:0;background:linear-gradient(180deg,#0d2b24,var(--bg));z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+.incov.on{display:flex}
+.incav{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--pk),#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:44px;animation:rng 1.5s ease-in-out infinite}
+@keyframes rng{0%,100%{box-shadow:0 0 0 10px rgba(0,168,132,.15),0 0 0 20px rgba(0,168,132,.07)}50%{box-shadow:0 0 0 15px rgba(0,168,132,.2),0 0 0 30px rgba(0,168,132,.1)}}
+.incnm{font-size:24px;font-weight:700}
+.inctp{font-size:13px;color:var(--mu);animation:fd 1s ease-in-out infinite alternate}
+@keyframes fd{0%{opacity:.5}100%{opacity:1}}
+.incacts{display:flex;gap:48px}
+.incbtn{display:flex;flex-direction:column;align-items:center;gap:7px;border:none;background:none;cursor:pointer}
+.incc{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px}
+.incc.dec{background:var(--re);box-shadow:0 5px 18px rgba(234,67,53,.4)}
+.incc.acc{background:var(--gr);box-shadow:0 5px 18px rgba(0,168,132,.4)}
+.inclbl{font-size:11px;color:var(--mu);font-weight:600}
+
+/* CALL */
+.callv{position:fixed;inset:0;background:#000;z-index:200;display:none;flex-direction:column}
+.callv.on{display:flex}
+#remVid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+.remph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:linear-gradient(180deg,#0d2b24,#0b141a);transition:opacity .3s}
+.remav{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--pk),#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:40px}
+.remnm{font-size:18px;font-weight:700;color:#fff}
+.cdur{font-size:13px;color:rgba(255,255,255,.6)}
+.awaves{display:none;align-items:center;gap:4px;height:30px}
+.aw{width:4px;border-radius:2px;background:var(--gr)}
+.aw.on{animation:awav .7s ease-in-out infinite}
+@keyframes awav{0%,100%{height:5px}50%{height:26px}}
+#locVid{position:absolute;top:12px;right:12px;width:80px;height:114px;border-radius:10px;object-fit:cover;border:2px solid rgba(255,255,255,.2);background:#222;z-index:10;display:none}
+.calltop{position:absolute;top:0;left:0;right:0;padding:12px 14px;background:linear-gradient(to bottom,rgba(0,0,0,.6),transparent);z-index:10}
+.callpeer{font-size:14px;font-weight:700;color:#fff}
+.callst{font-size:11px;color:rgba(255,255,255,.6)}
+.callctrls{position:absolute;bottom:0;left:0;right:0;padding:18px 18px 36px;background:linear-gradient(to top,rgba(0,0,0,.8),transparent);display:flex;align-items:center;justify-content:center;gap:10px;z-index:10;flex-wrap:wrap}
+.ctrl{display:flex;flex-direction:column;align-items:center;gap:5px;border:none;background:none;cursor:pointer}
+.ctrlc{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(255,255,255,.15);backdrop-filter:blur(10px);color:#fff}
+.ctrlc.end{background:var(--re);width:60px;height:60px;font-size:22px}
+.ctrlc.muted{background:rgba(255,255,255,.35)}
+.ctrll{font-size:10px;color:rgba(255,255,255,.7);font-weight:600}
+
+.ivr{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:300;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.ivr.on{display:flex}
+.ivr img{max-width:95vw;max-height:80vh;border-radius:8px}
+.ivrcl{font-size:28px;cursor:pointer;color:#fff}
+.toast{position:fixed;top:110px;left:50%;transform:translateX(-50%) translateY(-10px);background:var(--s3);color:var(--tx);padding:8px 16px;border-radius:22px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:9999;white-space:nowrap;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+::-webkit-scrollbar{width:2px}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.sp{animation:sp 1s linear infinite;display:inline-block}
+input[type=file]{display:none}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="ttl">💚 SanjayMitu</div>
+  <div class="badge" id="myBadge" onclick="copyId()"><span class="sp" style="font-size:10px">⏳</span></div>
+</div>
+
+<div class="tabnav">
+  <button class="tn on" id="tn-chat" onclick="goTab('chat')"><span class="nbdg" id="bd-chat"></span><span class="tn-ico">💬</span><span class="tn-lbl">চ্যাট</span></button>
+  <button class="tn" id="tn-calls" onclick="goTab('calls')"><span class="nbdg" id="bd-calls"></span><span class="tn-ico">📞</span><span class="tn-lbl">কল</span></button>
+  <button class="tn" id="tn-images" onclick="goTab('images')"><span class="nbdg" id="bd-images"></span><span class="tn-ico">🖼️</span><span class="tn-lbl">মিডিয়া</span></button>
+  <button class="tn" id="tn-files" onclick="goTab('files')"><span class="nbdg" id="bd-files"></span><span class="tn-ico">📁</span><span class="tn-lbl">ফাইল</span></button>
+</div>
+
+<div class="main">
+  <!-- CHAT -->
+  <div class="tab on" id="tab-chat">
+    <div class="stbar" id="stBar"></div>
+    <div class="cbox" id="cbox">
+      <div class="clbl">কোড দিয়ে সংযুক্ত হন</div>
+      <div class="crow">
+        <input class="cinp" id="peerInp" type="text" maxlength="6" placeholder="৬ ডিজিটের কোড" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
+        <button class="cbtn" onclick="doConnect()">✅</button>
+      </div>
+    </div>
+    <div class="banner" id="banner">
+      <div class="bav">👩</div>
+      <div class="binfo"><div class="bnm" id="bnm">মিতু</div><div class="bst">🟢 অনলাইন</div></div>
+      <div class="bacts">
+        <button class="bact a" onclick="makeCall('audio')">📞</button>
+        <button class="bact v" onclick="makeCall('video')">📹</button>
+      </div>
+    </div>
+    <div class="msgs" id="msgs" onclick="closeAllPopups()">
+      <div class="sysmsg">💬 মেসেজে দীর্ঘ ট্যাপ = ডিলিট</div>
+    </div>
+    <div class="cbar">
+      <button class="iico" onclick="document.getElementById('anyFile').click()" title="ফাইল/ছবি/ভিডিও">📎</button>
+      <textarea class="minp" id="msgInp" placeholder="মেসেজ লিখুন..." rows="1"
+        oninput="aResize(this)"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
+      <button class="sbtn" onclick="sendMsg()">➤</button>
+    </div>
+  </div>
+
+  <!-- CALLS -->
+  <div class="tab" id="tab-calls">
+    <div class="cbody">
+      <div class="ccrd" onclick="makeCall('video')"><div class="cico v">📹</div><div class="ctxt"><div class="ctitle">ভিডিও কল</div><div class="cdesc">মিতুকে ভিডিও কল করুন</div></div><span class="carr">›</span></div>
+      <div class="ccrd" onclick="makeCall('audio')"><div class="cico a">📞</div><div class="ctxt"><div class="ctitle">অডিও কল</div><div class="cdesc">মিতুকে ভয়েস কল করুন</div></div><span class="carr">›</span></div>
+      <div class="hhdr">কল হিস্ট্রি</div>
+      <div id="callHist"><div class="etxt">এখনো কোনো কল নেই</div></div>
+    </div>
+  </div>
+
+  <!-- MEDIA -->
+  <div class="tab" id="tab-images">
+    <div class="ibody">
+      <div class="uzone" onclick="document.getElementById('mediaFile').click()">
+        <div class="uico">🖼️🎬</div>
+        <div class="utitle">ছবি ও ভিডিও পাঠান</div>
+        <div class="udesc">সর্বোচ্চ ১০০MB • Cloudinary</div>
+      </div>
+      <div class="igrid" id="igrid"></div>
+      <div class="etxt" id="iempty">এখনো কোনো মিডিয়া নেই</div>
+    </div>
+  </div>
+
+  <!-- FILES -->
+  <div class="tab" id="tab-files">
+    <div class="fbody">
+      <div class="fupz" onclick="document.getElementById('docFile').click()">
+        <div class="uico">📁</div>
+        <div class="utitle">ফাইল পাঠান</div>
+        <div class="udesc">সর্বোচ্চ ১০০MB • Cloudinary</div>
+      </div>
+      <div class="flist" id="flist"></div>
+      <div class="etxt" id="fempty">এখনো কোনো ফাইল নেই</div>
+    </div>
+  </div>
+</div>
+
+<!-- INCOMING -->
+<div class="incov" id="incov">
+  <div class="incav">👩</div>
+  <div class="incnm" id="incNm">------</div>
+  <div class="inctp" id="incTp">📹 ভিডিও কল আসছে...</div>
+  <div class="incacts">
+    <button class="incbtn" onclick="decCall()"><div class="incc dec">📵</div><span class="inclbl">রিজেক্ট</span></button>
+    <button class="incbtn" onclick="accCall()"><div class="incc acc" id="accIco">📹</div><span class="inclbl">ধরুন</span></button>
+  </div>
+</div>
+
+<!-- CALL -->
+<div class="callv" id="callv">
+  <div class="remph" id="remPh">
+    <div class="remav">👩</div>
+    <div class="remnm" id="remNm">------</div>
+    <div class="cdur" id="callDur">সংযুক্ত হচ্ছে...</div>
+    <div class="awaves" id="awaves">
+      <div class="aw" style="animation-delay:.00s"></div><div class="aw" style="animation-delay:.12s"></div>
+      <div class="aw" style="animation-delay:.24s"></div><div class="aw" style="animation-delay:.36s"></div>
+      <div class="aw" style="animation-delay:.48s"></div>
+    </div>
+  </div>
+  <video id="remVid" autoplay playsinline></video>
+  <video id="locVid" autoplay playsinline muted></video>
+  <div class="calltop"><div class="callpeer" id="callPeer">------</div><div class="callst" id="callSt">সংযুক্ত হচ্ছে...</div></div>
+  <div class="callctrls">
+    <button class="ctrl" onclick="togMic()"><div class="ctrlc" id="micC">🎤</div><span class="ctrll">মিউট</span></button>
+    <button class="ctrl" onclick="endCall()"><div class="ctrlc end">📵</div><span class="ctrll">কাটুন</span></button>
+    <button class="ctrl" onclick="togCam()" id="camCtrl"><div class="ctrlc" id="camC">📹</div><span class="ctrll">ক্যামেরা</span></button>
+    <button class="ctrl" onclick="flipCam()" id="flipCtrl" style="display:none"><div class="ctrlc">🔄</div><span class="ctrll">ফ্লিপ</span></button>
+  </div>
+</div>
+
+<div class="ivr" id="ivr"><span class="ivrcl" onclick="document.getElementById('ivr').classList.remove('on')">✕</span><img id="ivrImg" src="" alt=""></div>
+<div class="toast" id="toast"></div>
+
+<!-- File inputs -->
+<input type="file" id="anyFile" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar" onchange="uploadToCloudinary(this)">
+<input type="file" id="mediaFile" accept="image/*,video/*" onchange="uploadToCloudinary(this)">
+<input type="file" id="docFile" onchange="uploadToCloudinary(this)">
+
+<script>
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+
+// ── Cloudinary Config ────────────────────────────────────────
+const CLOUD = {
+  name: 'dmkrhqej1',
+  apiKey: '624465566832658',
+  preset: 'ml_default' // Cloudinary default unsigned preset
+};
+
+// ── Firebase ─────────────────────────────────────────────────
+firebase.initializeApp({
+  apiKey:"AIzaSyCVdsQ3qE4wy9ES0dbTOzlGU-hBgHv7p6k",
+  authDomain:"sanjaymitu-cff8a.firebaseapp.com",
+  databaseURL:"https://sanjaymitu-cff8a-default-rtdb.firebaseio.com",
+  projectId:"sanjaymitu-cff8a",
+  storageBucket:"sanjaymitu-cff8a.firebasestorage.app",
+  messagingSenderId:"690573709457",
+  appId:"1:690573709457:web:9a95cdada56b3b7a3b6fbd"
+});
+const db = firebase.database();
+
+let peer=null,myId=null,lStream=null,curCall=null,incCall=null;
+let micOn=true,camOn=true,cType='video',facingMode='user';
+let tInt=null,tStart=null,connPeer=null;
+let curTab='chat',allMedia=[],allFiles=[];
+let unread={chat:0,calls:0,images:0,files:0};
+
+// ── Tab ──────────────────────────────────────────────────────
+function goTab(t){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.tn').forEach(x=>x.classList.remove('on'));
+  document.getElementById('tab-'+t).classList.add('on');
+  document.getElementById('tn-'+t).classList.add('on');
+  curTab=t; unread[t]=0; setBdg(t,0);
+  if(t==='images')renderMedia();
+  if(t==='files')renderFiles();
+  if(t==='chat'){const m=document.getElementById('msgs');m.scrollTop=m.scrollHeight;}
+  closeAllPopups();
+}
+function setBdg(t,n){const b=document.getElementById('bd-'+t);if(n>0){b.textContent=n>9?'9+':n;b.classList.add('on');}else b.classList.remove('on');}
+
+// ── Peer ─────────────────────────────────────────────────────
+function genId(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
+
+function initPeer(){
+  const id=localStorage.getItem('smid3')||genId();
+  localStorage.setItem('smid3',id);
+  peer=new Peer(id,{config:{iceServers:[
+    {urls:'stun:stun.l.google.com:19302'},
+    {urls:'stun:stun1.l.google.com:19302'},
+    {urls:'turn:openrelay.metered.ca:80',username:'openrelayproject',credential:'openrelayproject'},
+    {urls:'turn:openrelay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'},
+  ]},debug:0});
+  peer.on('open',i=>{
+    myId=i;
+    document.getElementById('myBadge').textContent='📌 '+i;
+    setSt('✅ প্রস্তুত! কোড: '+i,'k');
+    setTimeout(hideSt,5000);
+    listenFB();
+    if('Notification' in window && Notification.permission==='default') Notification.requestPermission();
+  });
+  peer.on('call',call=>{
+    incCall=call; cType=call.metadata?.type||'video';
+    document.getElementById('incNm').textContent=call.peer;
+    document.getElementById('incTp').textContent=cType==='video'?'📹 ভিডিও কল আসছে...':'📞 অডিও কল আসছে...';
+    document.getElementById('accIco').textContent=cType==='video'?'📹':'📞';
+    document.getElementById('incov').classList.add('on');
+    if(navigator.vibrate)navigator.vibrate([400,150,400,150,400]);
+    notify('📹 কল আসছে!',call.peer+' কল করছে');
+  });
+  peer.on('error',e=>{if(e.type==='unavailable-id'){localStorage.setItem('smid3',genId());initPeer();return;}setSt('❌ সংযোগ সমস্যা','e');});
+  peer.on('disconnected',()=>peer.reconnect());
+}
+
+function notify(t,b){
+  if('Notification' in window && Notification.permission==='granted')
+    new Notification(t,{body:b});
+}
+
+// ── Firebase ─────────────────────────────────────────────────
+function listenFB(){
+  const since=Date.now();
+  db.ref('sm3/msgs').orderByChild('time').startAt(since).on('child_added',snap=>{
+    const d=snap.val(); if(!d||d.sender===myId)return;
+    addMsgUI(d,'them',snap.key);
+    const isMedia=d.type==='image'||d.type==='video';
+    if(isMedia){allMedia.unshift(d);if(curTab==='images')renderMedia();else{unread.images++;setBdg('images',unread.images);}}
+    if(d.type==='file'){allFiles.unshift(d);if(curTab==='files')renderFiles();else{unread.files++;setBdg('files',unread.files);}}
+    if(curTab!=='chat'){unread.chat++;setBdg('chat',unread.chat);}
+    showToast('💬 নতুন মেসেজ!');
+    if(navigator.vibrate)navigator.vibrate(150);
+    notify('💬 নতুন মেসেজ',d.type==='text'?d.text:'মিডিয়া পাঠিয়েছে');
+  });
+  db.ref('sm3/msgs').orderByChild('time').limitToLast(40).once('value',snap=>{
+    const msgs=[];
+    snap.forEach(c=>msgs.push({key:c.key,val:c.val()}));
+    msgs.forEach(({key,val:d})=>{
+      if(!d)return;
+      addMsgUI(d,d.sender===myId?'me':'them',key);
+      if(d.type==='image'||d.type==='video')allMedia.unshift(d);
+      if(d.type==='file')allFiles.unshift(d);
+    });
+  });
+  db.ref('sm3/msgs').on('child_removed',snap=>{
+    const el=document.getElementById('msg_'+snap.key);
+    if(el)el.remove();
+  });
+  db.ref('sm3/sig/'+myId).on('value',snap=>{
+    const d=snap.val(); if(!d)return;
+    if(d.type==='connect'){connPeer=d.from;showConn(d.from);db.ref('sm3/sig/'+myId).remove();}
+  });
+}
+
+function doConnect(){
+  const pid=document.getElementById('peerInp').value.trim().toUpperCase();
+  if(!pid||pid.length<4){setSt('❌ সঠিক কোড দিন','e');return;}
+  if(pid===myId){setSt('❌ নিজের কোড দেওয়া যাবে না','e');return;}
+  connPeer=pid;
+  db.ref('sm3/sig/'+pid).set({type:'connect',from:myId,time:Date.now()});
+  showConn(pid);
+}
+
+function showConn(pid){
+  document.getElementById('cbox').style.display='none';
+  document.getElementById('banner').classList.add('on');
+  document.getElementById('bnm').textContent='মিতু ('+pid+')';
+  setSt('🟢 সংযুক্ত!','k'); setTimeout(hideSt,3000);
+}
+
+// ── Chat ─────────────────────────────────────────────────────
+function sendMsg(){
+  const inp=document.getElementById('msgInp');
+  const txt=inp.value.trim(); if(!txt)return;
+  const msg={type:'text',text:txt,sender:myId,time:Date.now()};
+  const ref=db.ref('sm3/msgs').push(msg);
+  addMsgUI(msg,'me',ref.key);
+  inp.value=''; inp.style.height='auto';
+}
+
+function addMsgUI(d,side,key){
+  const wrap=document.createElement('div');
+  wrap.className='mw '+side;
+  wrap.id='msg_'+key;
+  const time=new Date(d.time||Date.now()).toLocaleTimeString('bn-BD',{hour:'2-digit',minute:'2-digit'});
+  let h='';
+  const lp=`ontouchstart="startLP('${key}')" ontouchend="clearLP()" ontouchmove="clearLP()" oncontextmenu="showDel('${key}');return false"`;
+
+  if(d.type==='text'){
+    h=`<div class="mb" ${lp}>${esc(d.text)}</div><div class="mt">${time}</div>`;
+  }else if(d.type==='image'){
+    h=`<div class="mb" style="padding:3px" ${lp}><img style="max-width:220px;border-radius:8px;cursor:pointer;display:block" src="${d.url}" onclick="viewImg('${d.url}')"></div><div class="mt">${time}</div>`;
+  }else if(d.type==='video'){
+    h=`<div class="mb" style="padding:3px" ${lp}><video style="max-width:220px;border-radius:8px;display:block" src="${d.url}" controls playsinline></video></div><div class="mt">${time}</div>`;
+  }else if(d.type==='file'){
+    h=`<div class="mb" ${lp}><div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border-radius:8px;padding:7px 10px;cursor:pointer" onclick="window.open('${d.url}','_blank')"><span style="font-size:20px">${gfico(d.name)}</span><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px">${esc(d.name)}</div><div style="font-size:11px;color:var(--mu)">${fmtSz(d.size||0)}</div></div><span>⬇️</span></div></div><div class="mt">${time}</div>`;
+  }
+  h+=`<div class="del-popup" id="pop_${key}"><div class="del-opt" onclick="delMsg('${key}')">🗑️ ডিলিট করুন</div></div>`;
+  wrap.innerHTML=h;
+  const m=document.getElementById('msgs');
+  m.appendChild(wrap); m.scrollTop=m.scrollHeight;
+}
+
+let lpT=null;
+function startLP(key){lpT=setTimeout(()=>showDel(key),600);}
+function clearLP(){clearTimeout(lpT);}
+function showDel(key){closeAllPopups();const p=document.getElementById('pop_'+key);if(p){p.classList.add('on');}}
+function closeAllPopups(){document.querySelectorAll('.del-popup.on').forEach(p=>p.classList.remove('on'));}
+function delMsg(key){db.ref('sm3/msgs/'+key).remove();closeAllPopups();}
+
+// ── Cloudinary Upload ─────────────────────────────────────────
+function uploadToCloudinary(inp){
+  const f=inp.files[0]; if(!f)return;
+  if(f.size>100*1024*1024){showToast('❌ ফাইল ১০০MB-র কম হতে হবে');inp.value='';return;}
+
+  // Determine resource type
+  const isImage=f.type.startsWith('image/');
+  const isVideo=f.type.startsWith('video/')||f.type.startsWith('audio/');
+  const resourceType=isImage?'image':isVideo?'video':'raw';
+
+  // Show upload progress
+  const loader=document.createElement('div');
+  loader.className='upl';
+  loader.innerHTML=`⏳ আপলোড হচ্ছে: ${f.name}<div class="prog-wrap"><div class="prog-bar" id="prog_${Date.now()}"></div></div>`;
+  const loaderKey='loader_'+Date.now();
+  loader.id=loaderKey;
+  const m=document.getElementById('msgs'); m.appendChild(loader); m.scrollTop=m.scrollHeight;
+  goTab('chat');
+
+  const formData=new FormData();
+  formData.append('file',f);
+  formData.append('upload_preset','ml_default');
+  formData.append('api_key',CLOUD.apiKey);
+
+  const xhr=new XMLHttpRequest();
+  xhr.upload.onprogress=e=>{
+    if(e.lengthComputable){
+      const pct=Math.round(e.loaded/e.total*100);
+      const bar=loader.querySelector('.prog-bar');
+      if(bar)bar.style.width=pct+'%';
+      loader.firstChild.textContent=`⏳ ${pct}% — ${f.name}`;
+    }
+  };
+
+  xhr.onload=()=>{
+    loader.remove();
+    if(xhr.status===200){
+      const res=JSON.parse(xhr.responseText);
+      const url=res.secure_url;
+      const type=isImage?'image':isVideo?'video':'file';
+      const msg={type,url,name:f.name,size:f.size,sender:myId,time:Date.now()};
+      const ref=db.ref('sm3/msgs').push(msg);
+      addMsgUI(msg,'me',ref.key);
+      if(type==='image'||type==='video'){allMedia.unshift(msg);if(curTab==='images')renderMedia();}
+      if(type==='file'){allFiles.unshift(msg);if(curTab==='files')renderFiles();}
+      showToast('✅ পাঠানো হয়েছে!');
+    }else{
+      // Fallback: try auto preset
+      tryFallbackUpload(f,loaderKey);
+    }
+  };
+
+  xhr.onerror=()=>{loader.remove();showToast('❌ নেটওয়ার্ক সমস্যা');};
+
+  xhr.open('POST',`https://api.cloudinary.com/v1_1/${CLOUD.name}/${resourceType}/upload`);
+  xhr.send(formData);
+  inp.value='';
+}
+
+function tryFallbackUpload(f,loaderKey){
+  // Try with unsigned upload without preset
+  const isImage=f.type.startsWith('image/');
+  const isVideo=f.type.startsWith('video/')||f.type.startsWith('audio/');
+  const resourceType=isImage?'image':isVideo?'video':'raw';
+
+  const loader2=document.createElement('div');
+  loader2.className='upl';
+  loader2.textContent='⏳ আবার চেষ্টা হচ্ছে...';
+  document.getElementById('msgs').appendChild(loader2);
+
+  const fd=new FormData();
+  fd.append('file',f);
+  fd.append('upload_preset','sanjaymitu');
+
+  fetch(`https://api.cloudinary.com/v1_1/${CLOUD.name}/${resourceType}/upload`,{method:'POST',body:fd})
+  .then(r=>r.json())
+  .then(res=>{
+    loader2.remove();
+    if(res.secure_url){
+      const type=isImage?'image':isVideo?'video':'file';
+      const msg={type,url:res.secure_url,name:f.name,size:f.size,sender:myId,time:Date.now()};
+      const ref=db.ref('sm3/msgs').push(msg);
+      addMsgUI(msg,'me',ref.key);
+      showToast('✅ পাঠানো হয়েছে!');
+    }else{
+      showToast('❌ Cloudinary preset ঠিক করুন। Settings → Upload Presets → "sanjaymitu" বানান (Unsigned)');
+    }
+  })
+  .catch(()=>{loader2.remove();showToast('❌ আপলোড ব্যর্থ');});
+}
+
+// ── Render ────────────────────────────────────────────────────
+function renderMedia(){
+  const g=document.getElementById('igrid');
+  const e=document.getElementById('iempty');
+  const items=allMedia.filter(i=>i.type==='image'||i.type==='video');
+  if(!items.length){e.style.display='block';g.innerHTML='';return;}
+  e.style.display='none';
+  g.innerHTML=items.map(i=>{
+    if(i.type==='video') return `<video class="ithumb" src="${i.url}" onclick="this.play()" style="cursor:pointer" playsinline muted></video>`;
+    return `<img class="ithumb" src="${i.url}" onclick="viewImg('${i.url}')" loading="lazy">`;
+  }).join('');
+}
+
+function renderFiles(){
+  const l=document.getElementById('flist');
+  const e=document.getElementById('fempty');
+  const files=allFiles.filter(f=>f.type==='file');
+  if(!files.length){e.style.display='block';l.innerHTML='';return;}
+  e.style.display='none';
+  l.innerHTML=files.map(f=>`<div class="fitem" onclick="window.open('${f.url}','_blank')"><span class="fico2">${gfico(f.name)}</span><div class="finf"><div class="fnm">${esc(f.name)}</div><div class="fmt2">${fmtSz(f.size||0)}</div></div><span class="fdl">⬇️</span></div>`).join('');
+}
+
+function gfico(n){const e=(n||'').split('.').pop().toLowerCase();if(e==='pdf')return'📕';if(['doc','docx'].includes(e))return'📝';if(['xls','xlsx'].includes(e))return'📊';if(['mp3','wav','ogg'].includes(e))return'🎵';if(['mp4','mkv','avi','mov'].includes(e))return'🎬';if(['zip','rar'].includes(e))return'🗜️';return'📄';}
+
+// ── Calls ─────────────────────────────────────────────────────
+async function makeCall(type){
+  if(!connPeer){setSt('❌ আগে সংযুক্ত হন','e');goTab('chat');return;}
+  cType=type; facingMode='user'; setSt('⏳ কল করা হচ্ছে...','i');
+  try{
+    const s=await getStream(type);
+    const call=peer.call(connPeer,s,{metadata:{type}});
+    curCall=call; callH(call,connPeer,type); showCallSc(connPeer,type);
+  }catch(e){setSt('❌ '+e.message,'e');}
+}
+
+async function accCall(){
+  if(!incCall)return;
+  try{
+    const s=await getStream(cType);
+    incCall.answer(s); curCall=incCall; const pid=incCall.peer; incCall=null;
+    if(!connPeer){connPeer=pid;showConn(pid);}
+    callH(curCall,pid,cType); showCallSc(pid,cType);
+    document.getElementById('incov').classList.remove('on');
+  }catch(e){setSt('❌ '+e.message,'e');document.getElementById('incov').classList.remove('on');}
+}
+
+function decCall(){
+  if(incCall){incCall.close();incCall=null;}
+  document.getElementById('incov').classList.remove('on');
+  if(navigator.vibrate)navigator.vibrate(0);
+}
+
+async function getStream(type){
+  if(lStream){lStream.getTracks().forEach(t=>t.stop());lStream=null;}
+  try{lStream=await navigator.mediaDevices.getUserMedia({video:type==='video'?{facingMode}:false,audio:true});}
+  catch(e){lStream=await navigator.mediaDevices.getUserMedia({video:false,audio:true});}
+  document.getElementById('locVid').srcObject=lStream; return lStream;
+}
+
+async function flipCam(){
+  facingMode=facingMode==='user'?'environment':'user';
+  showToast(facingMode==='environment'?'📷 ব্যাক ক্যামেরা':'🤳 ফ্রন্ট ক্যামেরা');
+  try{
+    const ns=await navigator.mediaDevices.getUserMedia({video:{facingMode},audio:true});
+    const vt=ns.getVideoTracks()[0];
+    if(curCall?.peerConnection){
+      const sender=curCall.peerConnection.getSenders().find(s=>s.track?.kind==='video');
+      if(sender)await sender.replaceTrack(vt);
+    }
+    if(lStream)lStream.getVideoTracks().forEach(t=>t.stop());
+    lStream=ns; document.getElementById('locVid').srcObject=lStream;
+  }catch(e){showToast('❌ ক্যামেরা বদলানো যায়নি');}
+}
+
+function callH(call,pid,type){
+  call.on('stream',s=>{
+    const rv=document.getElementById('remVid'); rv.srcObject=s; rv.style.display='block';
+    document.getElementById('remPh').style.opacity='0';
+    document.getElementById('callSt').textContent='🟢 সংযুক্ত';
+    if(type==='audio'){document.getElementById('awaves').style.display='flex';document.querySelectorAll('#awaves .aw').forEach(b=>b.classList.add('on'));document.getElementById('locVid').style.display='none';document.getElementById('flipCtrl').style.display='none';}
+    else{document.getElementById('locVid').style.display='block';document.getElementById('flipCtrl').style.display='flex';}
+    startT(); addHist(pid,type);
+  });
+  call.on('close',()=>endCall()); call.on('error',()=>endCall());
+}
+
+function addHist(pid,type){
+  const h=document.getElementById('callHist');
+  const emp=h.querySelector('.etxt'); if(emp)emp.remove();
+  const item=document.createElement('div'); item.className='hitem';
+  item.innerHTML=`<div class="hav">👩</div><div class="hinfo"><div class="hnm">${pid}</div><div class="htm">${type==='video'?'📹':'📞'} ${new Date().toLocaleTimeString('bn-BD',{hour:'2-digit',minute:'2-digit'})}</div></div><span class="hredo" onclick="makeCall('${type}')">🔄</span>`;
+  h.insertBefore(item,h.firstChild);
+}
+
+function showCallSc(pid,type){
+  document.getElementById('callPeer').textContent=pid;
+  document.getElementById('remNm').textContent=pid;
+  document.getElementById('callSt').textContent='⏳ সংযুক্ত হচ্ছে...';
+  document.getElementById('callDur').textContent='সংযুক্ত হচ্ছে...';
+  document.getElementById('remPh').style.opacity='1';
+  document.getElementById('remVid').style.display='none';
+  document.getElementById('locVid').style.display='none';
+  document.getElementById('awaves').style.display='none';
+  document.getElementById('flipCtrl').style.display='none';
+  document.getElementById('camCtrl').style.display=type==='audio'?'none':'flex';
+  document.getElementById('callv').classList.add('on');
+}
+
+function endCall(){
+  if(curCall){curCall.close();curCall=null;}
+  if(lStream){lStream.getTracks().forEach(t=>t.stop());lStream=null;}
+  stopT(); micOn=true; camOn=true;
+  document.getElementById('micC').textContent='🎤';
+  document.getElementById('camC').textContent='📹';
+  document.getElementById('remVid').srcObject=null;
+  document.getElementById('locVid').srcObject=null;
+  document.getElementById('callv').classList.remove('on');
+  if(navigator.vibrate)navigator.vibrate(0);
+  showToast('📵 কল শেষ');
+}
+
+function togMic(){if(!lStream)return;micOn=!micOn;lStream.getAudioTracks().forEach(t=>t.enabled=micOn);document.getElementById('micC').textContent=micOn?'🎤':'🔇';document.getElementById('micC').classList.toggle('muted',!micOn);showToast(micOn?'মাইক চালু':'মাইক বন্ধ');}
+function togCam(){if(!lStream)return;camOn=!camOn;lStream.getVideoTracks().forEach(t=>t.enabled=camOn);document.getElementById('camC').textContent=camOn?'📹':'📷';document.getElementById('locVid').style.opacity=camOn?'1':'0.3';showToast(camOn?'ক্যামেরা চালু':'ক্যামেরা বন্ধ');}
+function startT(){tStart=Date.now();tInt=setInterval(()=>{const s=Math.floor((Date.now()-tStart)/1000);const t=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');document.getElementById('callDur').textContent=t;document.getElementById('callSt').textContent='🟢 '+t;},1000);}
+function stopT(){clearInterval(tInt);tInt=null;tStart=null;}
+
+function setSt(m,t){const b=document.getElementById('stBar');b.className='stbar on '+t;b.innerHTML=m;}
+function hideSt(){document.getElementById('stBar').classList.remove('on');}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),3000);}
+function copyId(){if(!myId)return;navigator.clipboard.writeText(myId).catch(()=>{});showToast('✅ কপি: '+myId);}
+function aResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,88)+'px';}
+function esc(t){return(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
+function fmtSz(b){return b>1048576?(b/1048576).toFixed(1)+'MB':(b/1024).toFixed(0)+'KB';}
+function viewImg(src){document.getElementById('ivrImg').src=src;document.getElementById('ivr').classList.add('on');}
+
+document.getElementById('peerInp').addEventListener('keydown',e=>{if(e.key==='Enter')doConnect();});
+document.addEventListener('click',e=>{if(!e.target.closest('.del-popup')&&!e.target.closest('.mb'))closeAllPopups();});
+
+initPeer();
+</script>
+</body>
+</html>
